@@ -12,6 +12,38 @@ def union(p,q):
 		if e not in p:
 			p.append(e)
 
+
+def hash_string(keyword, nbuckets):
+    h = 0
+    for c in keyword:
+        h += ord(c)
+    return h % nbuckets
+
+
+def make_hashtable(nbuckets):
+	table = []
+	for n in range(nbuckets):
+		table.append([])
+    return table
+
+
+def hashtable_get_bucket(htable, keyword):
+    return htable[hash_string(keyword, len(htable))]
+
+
+def hashtable_lookup(htable, keyword):
+	bucket = hashtable_get_bucket(htable, keyword)
+	return lookup(bucket, keyword)
+
+
+def hashtable_update(htable, keyword, value):
+	bucket = hashtable_get_bucket(htable, keyword)
+	for entry in bucket:
+		if entry[0] == keyword:
+			entry[1] = value
+			return
+	bucket.append([keyword, value])
+
 ###############################################################################
 ## INDEXING FUNCTIONS #########################################################
 
@@ -33,7 +65,7 @@ def lookup(index, keyword):
 	for entry in index:
 		if entry[0] == keyword:
 			return entry[1]
-	return []
+	return None
 
 ###############################################################################
 ## CRAWLING FUNCTIONS #########################################################
@@ -46,7 +78,7 @@ def get_next_target(page):
     end_quote = page.find('"', start_quote + 1)
     url = page[start_quote + 1:end_quote]
     return url, end_quote
-                 
+
 
 def get_all_links(page):
 	links = []
