@@ -1,3 +1,43 @@
+
+## Considerations: ##
+# 1) Play nice! Obey robots.txt, etc
+# 2) Determine a good seed page (or pages)
+
+
+###############################################################################
+## HELPER FUNCTIONS ###########################################################
+
+def union(p,q):
+	for e in q:
+		if e not in p:
+			p.append(e)
+
+###############################################################################
+## INDEXING FUNCTIONS #########################################################
+
+def add_to_index(index, keyword, url):
+    for entry in index:
+        if entry[0] == keyword:
+            entry[1].append(url)
+            return
+    index.append([keyword,[url]])
+
+
+def add_page_to_index(index, url, content):
+    keywords = content.split()
+    for key in keywords:
+        add_to_index(index, key, url)
+
+
+def lookup(index, keyword):
+	for entry in index:
+		if entry[0] == keyword:
+			return entry[1]
+	return []
+
+###############################################################################
+## CRAWLING FUNCTIONS #########################################################
+
 def get_next_target(page):
     start_link = page.find('<a href=')
     if start_link == -1:
@@ -29,22 +69,20 @@ def get_page(url):
         return ''
 
 
-def union(p,q):
-	for e in q:
-		if e not in p:
-			p.append(e)
-
-
 def crawl_web(seed):
 	to_crawl = [seed]
 	crawled = []
+	index = []
 	while to_crawl:
 		page = to_crawl.pop()
 		if page not in crawled:
+			content = get_page(page)
+			add_page_to_index(index, page, content)
+			union(to_crawl, get_all_links(content))
 			crawled.append(page)
-			union(to_crawl, get_all_links(get_page(page)))
-	return crawled
+	return index
 
-
+###############################################################################
+## Test Code ##################################################################
 seed = 'http://www.google.com'
 print(crawl_web(seed))
