@@ -12,47 +12,14 @@ def union(p,q):
 		if e not in p:
 			p.append(e)
 
-
-def hash_string(keyword, nbuckets):
-    h = 0
-    for c in keyword:
-        h += ord(c)
-    return h % nbuckets
-
-
-def make_hashtable(nbuckets):
-	table = []
-	for n in range(nbuckets):
-		table.append([])
-    return table
-
-
-def hashtable_get_bucket(htable, keyword):
-    return htable[hash_string(keyword, len(htable))]
-
-
-def hashtable_lookup(htable, keyword):
-	bucket = hashtable_get_bucket(htable, keyword)
-	return lookup(bucket, keyword)
-
-
-def hashtable_update(htable, keyword, value):
-	bucket = hashtable_get_bucket(htable, keyword)
-	for entry in bucket:
-		if entry[0] == keyword:
-			entry[1] = value
-			return
-	bucket.append([keyword, value])
-
 ###############################################################################
 ## INDEXING FUNCTIONS #########################################################
 
 def add_to_index(index, keyword, url):
-    for entry in index:
-        if entry[0] == keyword:
-            entry[1].append(url)
-            return
-    index.append([keyword,[url]])
+	if keyword in index:
+		index[keyword].append(url)
+	else:
+    	index[keyword] = [url]
 
 
 def add_page_to_index(index, url, content):
@@ -62,9 +29,8 @@ def add_page_to_index(index, url, content):
 
 
 def lookup(index, keyword):
-	for entry in index:
-		if entry[0] == keyword:
-			return entry[1]
+	if keyword in index:
+		return index[keyword]
 	return None
 
 ###############################################################################
@@ -104,7 +70,7 @@ def get_page(url):
 def crawl_web(seed):
 	to_crawl = [seed]
 	crawled = []
-	index = []
+	index = {}
 	while to_crawl:
 		page = to_crawl.pop()
 		if page not in crawled:
