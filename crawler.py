@@ -12,6 +12,20 @@ def union(p,q):
 		if e not in p:
 			p.append(e)
 
+
+def quick_sort(elems, valfunc):
+    if len(elems) <= 1:
+        return elems
+    pivot = elems[0]
+    lte = []
+    gt = []
+    for e in elems[1:]:
+        if valfunc(e) <= valfunc(pivot):
+            lte.append(e)
+        else:
+            gt.append(e)
+    return quick_sort(gt, valfunc) + [pivot] + quick_sort(lte, valfunc)
+
 ###############################################################################
 ## RANKING FUNCTIONS ##########################################################
 
@@ -49,6 +63,12 @@ def lucky_search(index, ranks, keyword):
         if ranks[page] > ranks[best_page]:
             best_page = page
     return best_page
+
+
+def ordered_search(index, ranks, keyword):
+    if keyword not in index:
+        return None
+    return quick_sort(index[keyword], lambda e: ranks[e])
 
 ###############################################################################
 ## INDEXING FUNCTIONS #########################################################
