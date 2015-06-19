@@ -35,6 +35,21 @@ def compute_ranks(graph):
 		ranks = newranks
 	return ranks
 
+
+def lucky_search(index, ranks, keyword):
+	"""
+	Limitations: this only works on a single keyword
+	Todo: modify to accecpt a list of keywords and return the best
+		page for all the keywords
+	"""
+    if keyword not in index:
+        return None
+    best_page = index[keyword][0]
+    for page in index[keyword][1:]:
+        if ranks[page] > ranks[best_page]:
+            best_page = page
+    return best_page
+
 ###############################################################################
 ## INDEXING FUNCTIONS #########################################################
 
