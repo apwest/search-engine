@@ -13,6 +13,29 @@ def union(p,q):
 			p.append(e)
 
 ###############################################################################
+## RANKING FUNCTIONS ##########################################################
+
+def compute_ranks(graph):
+	d = 0.8		# damping factor
+	n = 10		# number of times to go through
+
+	ranks = {}
+	npages = len(graph)
+	for page in graph:
+		ranks[page] = 1.0 / npages
+
+	for i in range(n):
+		newranks = {}
+		for page in graph:
+			newrank = (1-d) / npages
+			for p in graph:
+				if page in graph[p]:
+					newrank += d * ranks[p] / len(graph[p])
+			newranks[page] = newrank
+		ranks = newranks
+	return ranks
+
+###############################################################################
 ## INDEXING FUNCTIONS #########################################################
 
 def add_to_index(index, keyword, url):
@@ -71,16 +94,19 @@ def crawl_web(seed):
 	to_crawl = [seed]
 	crawled = []
 	index = {}
+	graph = {}
 	while to_crawl:
 		page = to_crawl.pop()
 		if page not in crawled:
 			content = get_page(page)
 			add_page_to_index(index, page, content)
-			union(to_crawl, get_all_links(content))
+			outlinks = get_all_links(content)
+			union(to_crawl, outlinks)
+			graph[page] = outlinks
 			crawled.append(page)
-	return index
+	return index, graph
 
 ###############################################################################
 ## Test Code ##################################################################
-seed = 'http://www.google.com'
+seed = 'http://www.udacity.com/cs101x/urank/index.html'
 print(crawl_web(seed))
