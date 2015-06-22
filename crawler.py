@@ -27,27 +27,15 @@ def quick_sort(elems, valfunc):
     return quick_sort(gt, valfunc) + [pivot] + quick_sort(lte, valfunc)
 
 
-def collusion_with(g, k, a):
-    c = []
-    collusion_with_r(g, k, a, [a], c)
-    return c
-
-
-def collusion_with_r(g,k,a,l,c):
-    b = l[-1]
+def is_reciprocal(graph, src, dest, k):
     if k == 0:
-        if a in g[b]:
-            for i in range(len(l)-1):
-                c.append((l[i],l[i+1]))
-            c.append((b,a))
-        return
-    for node in g[b]:
-        if node == a:
-            for i in range(len(l)-1):
-                c.append((l[i],l[i+1]))
-            c.append((b,a))
-        else:
-            collusion_with_r(g,k-1,a,l+[node],c)
+        return src == dest
+    if src in g[dest]:
+        return True
+    for node in g[dest]:
+        if is_reciprocal(graph, src, node, k-1):
+            return True
+    return False
 
 ###############################################################################
 ## RANKING FUNCTIONS ##########################################################
@@ -67,7 +55,7 @@ def compute_ranks(graph, k=0):
 			c = collusion_with(graph, k, page)
 			newrank = (1-d) / npages
 			for p in graph:
-				if page in graph[p] and (node, page) not in c:
+				if page in graph[p] and not is_reciprocal(graph, node, page, k):
 					newrank += d * ranks[p] / len(graph[p])
 			newranks[page] = newrank
 		ranks = newranks
